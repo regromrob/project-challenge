@@ -81,12 +81,11 @@ class DogsController < ApplicationController
   def verify_owner
     if @dog.user != current_user
       redirect_to @dog
-    end
-    
+    end  
   end
   # Never trust parameters from the scary internet, only allow the white list through.
 
   def dog_params
-    params.require(:dog).permit(:name, :description, :images)
+    params.require(:dog).permit(:name, :description, images: [])
   end
 end
