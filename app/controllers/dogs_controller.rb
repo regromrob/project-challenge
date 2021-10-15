@@ -1,5 +1,8 @@
 class DogsController < ApplicationController
+  before_action :authenticate_user!, except: :index
   before_action :set_dog, only: [:show, :edit, :update, :destroy]
+  before_action :verify_owner, only: [:edit, :update, :destroy]
+
 
   # GET /dogs
   # GET /dogs.json
@@ -26,6 +29,7 @@ class DogsController < ApplicationController
   # POST /dogs.json
   def create
     @dog = Dog.new(dog_params)
+    @dog.user = current_user
 
     respond_to do |format|
       if @dog.save
@@ -43,6 +47,7 @@ class DogsController < ApplicationController
   # PATCH/PUT /dogs/1
   # PATCH/PUT /dogs/1.json
   def update
+    
     respond_to do |format|
       if @dog.update(dog_params)
         @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
@@ -73,7 +78,14 @@ class DogsController < ApplicationController
     @dog = Dog.find(params[:id])
   end
 
+  def verify_owner
+    if @dog.user != current_user
+      redirect_to @dog
+    end
+    
+  end
   # Never trust parameters from the scary internet, only allow the white list through.
+
   def dog_params
     params.require(:dog).permit(:name, :description, :images)
   end
